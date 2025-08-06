@@ -183,12 +183,17 @@ Content-Type: application/json
 ```json
 banking-api/
 ├── src/
-│   ├── routes/          # API route definitions
-│   │   ├── balance.ts   # Balance inquiry route
-│   │   ├── event.ts     # Banking operations routes
-│   │   └── reset.ts     # System reset route
-│   ├── services/        # Business logic
-│   │   └── accountService.ts  # Account management
+│   ├── controllers/     # Request handling and route management
+│   │   ├── balanceController.ts    # Balance inquiry controller
+│   │   ├── eventController.ts      # Banking operations controller
+│   │   └── resetController.ts      # System reset controller
+│   ├── use-cases/       # Business logic and application rules
+│   │   ├── depositUseCase.ts       # Deposit operation logic
+│   │   ├── withdrawUseCase.ts      # Withdrawal operation logic
+│   │   ├── transferUseCase.ts      # Transfer operation logic
+│   │   └── index.ts                # Use cases exports
+│   ├── services/        # Data management and persistence
+│   │   └── accountService.ts       # Account data management
 │   ├── types/           # TypeScript type definitions
 │   │   └── index.ts     # Interfaces and types
 │   ├── server.ts        # Express server configuration
@@ -204,14 +209,22 @@ banking-api/
 
 ### Application Layers
 
-1. **Routes**: Responsible for receiving HTTP requests and validating input data
-2. **Services**: Contain business logic and data manipulation
-3. **Types**: TypeScript interface and type definitions for type safety
+1. **Controllers**: Responsible for receiving HTTP requests, validating input data, and coordinating responses
+2. **Use Cases**: Contain business logic and application rules, implementing specific banking operations
+3. **Services**: Handle data management, persistence, and low-level operations
+4. **Types**: TypeScript interface and type definitions for type safety
+
+### Clean Architecture Benefits
+
+- **Separation of Concerns**: Each layer has a specific responsibility
+- **Testability**: Business logic is isolated in use cases, making it easy to test
+- **Maintainability**: Changes in one layer don't affect others
+- **Scalability**: New features can be added by creating new use cases and controllers
 
 ### Technical Features
 
 - **Type Safety**: Extensive use of TypeScript to prevent errors
-- **Modularity**: Code organized into well-defined modules
+- **Modularity**: Code organized into well-defined modules following Clean Architecture principles
 - **Documentation**: API completely documented with Swagger
 - **Validation**: Robust input data validation
 - **Error Handling**: Centralized middleware for error handling
