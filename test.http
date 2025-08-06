@@ -1,0 +1,58 @@
+### API Reset
+POST http://localhost:3000/reset
+
+### Deposit in account 100
+POST http://localhost:3000/event
+Content-Type: application/json
+
+{
+  "type": "deposit",
+  "destination": "100",
+  "amount": 10
+}
+
+### Consult balance of account 100
+GET http://localhost:3000/balance?account_id=100
+
+### Withdraw from account 100
+POST http://localhost:3000/event
+Content-Type: application/json
+
+{
+  "type": "withdraw",
+  "origin": "100",
+  "amount": 5
+}
+
+### Consult balance of account 100 after withdrawal
+GET http://localhost:3000/balance?account_id=100
+
+### Deposit in account 200
+POST http://localhost:3000/event
+Content-Type: application/json
+
+{
+  "type": "deposit",
+  "destination": "200",
+  "amount": 20
+}
+
+### Transfer from account 100 to 200
+POST http://localhost:3000/event
+Content-Type: application/json
+
+{
+  "type": "transfer",
+  "origin": "100",
+  "destination": "200",
+  "amount": 3
+}
+
+### Consult balance of account 100 after transfer
+GET http://localhost:3000/balance?account_id=100
+
+### Consult balance of account 200 after transfer
+GET http://localhost:3000/balance?account_id=200
+
+### Test non-existent account (should return 404)
+GET http://localhost:3000/balance?account_id=999
