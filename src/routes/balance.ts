@@ -54,7 +54,7 @@ router.get('/balance', (req: Request, res: Response) => {
     const account = AccountService.getAccount(account_id);
 
     if (!account) {
-        return res.status(404).send('There is no account with this ID');
+        return res.status(404).send('0');
     }
 
     return res.status(200).send(account.balance.toString());

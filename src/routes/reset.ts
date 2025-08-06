@@ -21,7 +21,7 @@ const router = express.Router();
  */
 router.post('/reset', (_req: Request, res: Response) => {
     AccountService.reset();
-    res.status(200).send('Accounts reseted successfully');
+    res.status(200).send('OK');
 });
 
 export default router;

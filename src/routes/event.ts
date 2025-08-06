@@ -188,7 +188,7 @@ router.post('/event', (req: Request, res: Response) => {
             try {
                 const originAccount = AccountService.withdraw(origin, amount);
                 if (!originAccount) {
-                    return res.status(404).send('There is no account with this ID');
+                    return res.status(404).send('0');
                 }
 
                 return res.status(201).json({
