@@ -19,15 +19,15 @@ app.use('/', resetRoutes);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     console.error(err.stack);
-    res.status(500).json({ error: 'Algo deu errado!' });
+    res.status(500).json({ error: 'Something went wrong!' });
 });
 
 app.use((_req: Request, res: Response) => {
-    res.status(404).json({ error: 'Rota não encontrada' });
+    res.status(404).json({ error: 'Route not found' });
 });
 
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
 
 export default app;

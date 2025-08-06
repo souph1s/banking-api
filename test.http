@@ -45,7 +45,7 @@ Content-Type: application/json
   "type": "transfer",
   "origin": "100",
   "destination": "200",
-  "amount": 3
+  "amount": 100
 }
 
 ### Consult balance of account 100 after transfer
@@ -55,4 +55,4 @@ GET http://localhost:3000/balance?account_id=100
 GET http://localhost:3000/balance?account_id=200
 
 ### Test non-existent account (should return 404)
-GET http://localhost:3000/balance?account_id=999
+GET http://localhost:3000/balance?account_id=1234

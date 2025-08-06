@@ -60,7 +60,12 @@ export namespace AccountService {
         if (!account) {
             return null;
         }
+
         const currentBalance = account.balance;
+        if (currentBalance < amount) {
+            throw new Error('Insufficient balance');
+        }
+
         return updateBalance(accountId, currentBalance - amount);
     }
 
@@ -71,6 +76,11 @@ export namespace AccountService {
     ): TransferResponse | null {
         if (!accountExists(originId)) {
             return null;
+        }
+
+        const originAccount = accounts[originId];
+        if (originAccount && originAccount.balance < amount) {
+            throw new Error('Insufficient balance');
         }
 
         const origin = withdraw(originId, amount);

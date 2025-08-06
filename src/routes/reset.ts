@@ -8,20 +8,20 @@ const router = express.Router();
  * /reset:
  *   post:
  *     summary: Reset all accounts
- *     description: Remove todas as contas do sistema
- *     tags: [Sistema]
+ *     description: Reset all accounts in the system
+ *     tags: [System]
  *     responses:
  *       200:
- *         description: Sistema resetado com sucesso
+ *         description: System reset successfully
  *         content:
  *           text/plain:
  *             schema:
  *               type: string
  *               example: OK
  */
-router.post('/reset', (res: Response) => {
+router.post('/reset', (_req: Request, res: Response) => {
     AccountService.reset();
-    res.status(200).send('OK');
+    res.status(200).send('Accounts reseted successfully');
 });
 
 export default router;

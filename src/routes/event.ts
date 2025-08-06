@@ -13,10 +13,10 @@ const router = express.Router();
  *       properties:
  *         id:
  *           type: string
- *           description: ID da conta
+ *           description: Account ID
  *         balance:
  *           type: number
- *           description: Saldo da conta
+ *           description: Account balance
  *       example:
  *         id: "100"
  *         balance: 10
@@ -28,10 +28,10 @@ const router = express.Router();
  *           enum: [deposit]
  *         destination:
  *           type: string
- *           description: ID da conta de destino
+ *           description: Destination account ID
  *         amount:
  *           type: number
- *           description: Valor a ser depositado
+ *           description: Amount to be deposited
  *       required:
  *         - type
  *         - destination
@@ -48,10 +48,10 @@ const router = express.Router();
  *           enum: [withdraw]
  *         origin:
  *           type: string
- *           description: ID da conta de origem
+ *           description: Origin account ID
  *         amount:
  *           type: number
- *           description: Valor a ser sacado
+ *           description: Amount to be withdrawn
  *       required:
  *         - type
  *         - origin
@@ -68,13 +68,13 @@ const router = express.Router();
  *           enum: [transfer]
  *         origin:
  *           type: string
- *           description: ID da conta de origem
+ *           description: Origin account ID
  *         destination:
  *           type: string
- *           description: ID da conta de destino
+ *           description: Destination account ID
  *         amount:
  *           type: number
- *           description: Valor a ser transferido
+ *           description: Amount to be transferred
  *       required:
  *         - type
  *         - origin
@@ -92,8 +92,8 @@ const router = express.Router();
  * /event:
  *   post:
  *     summary: Process banking events
- *     description: Processa eventos bancários (depósito, saque, transferência)
- *     tags: [Eventos]
+ *     description: Process banking events (deposit, withdraw, transfer)
+ *     tags: [Events]
  *     requestBody:
  *       required: true
  *       content:
@@ -105,7 +105,7 @@ const router = express.Router();
  *               - $ref: '#/components/schemas/TransferEvent'
  *     responses:
  *       201:
- *         description: Evento processado com sucesso
+ *         description: Event processed successfully
  *         content:
  *           application/json:
  *             schema:
@@ -125,7 +125,7 @@ const router = express.Router();
  *                     destination:
  *                       $ref: '#/components/schemas/Account'
  *       400:
- *         description: Dados inválidos
+ *         description: Invalid data
  *         content:
  *           application/json:
  *             schema:
@@ -134,14 +134,14 @@ const router = express.Router();
  *                 error:
  *                   type: string
  *       404:
- *         description: Conta não encontrada ou saldo insuficiente
+ *         description: Account not found or insufficient balance
  *         content:
  *           text/plain:
  *             schema:
  *               type: string
  *               example: "0"
  *       500:
- *         description: Erro interno do servidor
+ *         description: Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -155,7 +155,7 @@ router.post('/event', (req: Request, res: Response) => {
     const { type, amount } = eventData;
 
     if (!type || !amount) {
-        return res.status(400).json({ error: 'type e amount são obrigatórios' });
+        return res.status(400).json({ error: 'type and amount are mandatory' });
     }
 
     switch (type) {
@@ -164,7 +164,7 @@ router.post('/event', (req: Request, res: Response) => {
             if (!destination) {
                 return res
                     .status(400)
-                    .json({ error: 'destination é obrigatório para deposit' });
+                    .json({ error: 'destination is mandatory for deposit' });
             }
 
             try {
@@ -173,7 +173,7 @@ router.post('/event', (req: Request, res: Response) => {
                     destination: account,
                 });
             } catch {
-                return res.status(500).json({ error: 'Erro ao processar depósito' });
+                return res.status(500).json({ error: 'Error processing deposit' });
             }
         }
 
@@ -182,17 +182,24 @@ router.post('/event', (req: Request, res: Response) => {
             if (!origin) {
                 return res
                     .status(400)
-                    .json({ error: 'origin é obrigatório para withdraw' });
+                    .json({ error: 'Origin is mandatory for withdraw' });
             }
 
-            const originAccount = AccountService.withdraw(origin, amount);
-            if (!originAccount) {
-                return res.status(404).send('0');
-            }
+            try {
+                const originAccount = AccountService.withdraw(origin, amount);
+                if (!originAccount) {
+                    return res.status(404).send('There is no account with this ID');
+                }
 
-            return res.status(201).json({
-                origin: originAccount,
-            });
+                return res.status(201).json({
+                    origin: originAccount,
+                });
+            } catch (error) {
+                if (error instanceof Error && error.message === 'Insufficient balance') {
+                    return res.status(400).json({ error: 'Insufficient balance' });
+                }
+                return res.status(500).json({ error: 'Error processing withdraw' });
+            }
         }
 
         case 'transfer': {
@@ -201,20 +208,27 @@ router.post('/event', (req: Request, res: Response) => {
                 return res
                     .status(400)
                     .json({
-                        error: 'origin e destination são obrigatórios para transfer',
+                        error: 'origin and destination are mandatory for transfer',
                     });
             }
 
-            const result = AccountService.transfer(origin, destination, amount);
-            if (!result) {
-                return res.status(404).send('0');
-            }
+            try {
+                const result = AccountService.transfer(origin, destination, amount);
+                if (!result) {
+                    return res.status(404).send('0');
+                }
 
-            return res.status(201).json(result);
+                return res.status(201).json(result);
+            } catch (error) {
+                if (error instanceof Error && error.message === 'Insufficient balance') {
+                    return res.status(400).json({ error: 'Insufficient balance' });
+                }
+                return res.status(500).json({ error: 'Error processing transfer' });
+            }
         }
 
         default:
-            return res.status(400).json({ error: 'Tipo de evento inválido' });
+            return res.status(400).json({ error: 'Event type is invalid' });
     }
 });
 

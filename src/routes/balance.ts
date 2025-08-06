@@ -8,33 +8,33 @@ const router = express.Router();
  * /balance:
  *   get:
  *     summary: Get account balance
- *     description: Obtém o saldo de uma conta específica
- *     tags: [Contas]
+ *     description: Get the balance of a specific account
+ *     tags: [Accounts]
  *     parameters:
  *       - in: query
  *         name: account_id
  *         required: true
  *         schema:
  *           type: string
- *         description: ID da conta
+ *         description: Account ID
  *         example: "100"
  *     responses:
  *       200:
- *         description: Saldo da conta
+ *         description: Account balance
  *         content:
  *           text/plain:
  *             schema:
  *               type: string
  *               example: "10"
  *       404:
- *         description: Conta não encontrada
+ *         description: Account not found
  *         content:
  *           text/plain:
  *             schema:
  *               type: string
  *               example: "0"
  *       400:
- *         description: Parâmetro account_id é obrigatório
+ *         description: Account ID is mandatory
  *         content:
  *           application/json:
  *             schema:
@@ -42,19 +42,19 @@ const router = express.Router();
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "account_id é obrigatório"
+ *                   example: "account_id is mandatory"
  */
 router.get('/balance', (req: Request, res: Response) => {
     const { account_id } = req.query;
 
     if (!account_id || typeof account_id !== 'string') {
-        return res.status(400).json({ error: 'account_id é obrigatório' });
+        return res.status(400).json({ error: 'account_id is mandatory' });
     }
 
     const account = AccountService.getAccount(account_id);
 
     if (!account) {
-        return res.status(404).send('0');
+        return res.status(404).send('There is no account with this ID');
     }
 
     return res.status(200).send(account.balance.toString());
