@@ -39,13 +39,13 @@ export namespace AccountService {
 
         const account = accounts[accountId];
         if (!account) {
-            throw new Error('Conta não encontrada');
+            throw new Error('Account not found');
         }
         const currentBalance = account.balance;
         const updatedAccount = updateBalance(accountId, currentBalance + amount);
 
         if (!updatedAccount) {
-            throw new Error('Erro ao atualizar saldo da conta');
+            throw new Error('Error updating account balance');
         }
 
         return updatedAccount;
