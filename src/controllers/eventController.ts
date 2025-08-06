@@ -1,8 +1,14 @@
 import express, { type Request, type Response } from 'express';
-import { AccountService } from '../services/accountService';
 import type { Event } from '../types';
+import { DepositUseCase } from '../use-cases/depositUseCase';
+import { WithdrawUseCase } from '../use-cases/withdrawUseCase';
+import { TransferUseCase } from '../use-cases/transferUseCase';
 
 const router = express.Router();
+
+const depositUseCase = new DepositUseCase();
+const withdrawUseCase = new WithdrawUseCase();
+const transferUseCase = new TransferUseCase();
 
 /**
  * @swagger
@@ -150,7 +156,7 @@ const router = express.Router();
  *                 error:
  *                   type: string
  */
-router.post('/event', (req: Request, res: Response) => {
+export function processEvent(req: Request, res: Response) {
     const eventData: Event = req.body;
     const { type, amount } = eventData;
 
@@ -168,11 +174,14 @@ router.post('/event', (req: Request, res: Response) => {
             }
 
             try {
-                const account = AccountService.deposit(destination, amount);
+                const account = depositUseCase.execute(destination, amount);
                 return res.status(201).json({
                     destination: account,
                 });
-            } catch {
+            } catch (error) {
+                if (error instanceof Error && error.message === 'Amount must be positive') {
+                    return res.status(400).json({ error: 'Amount must be positive' });
+                }
                 return res.status(500).json({ error: 'Error processing deposit' });
             }
         }
@@ -182,11 +191,11 @@ router.post('/event', (req: Request, res: Response) => {
             if (!origin) {
                 return res
                     .status(400)
-                    .json({ error: 'Origin is mandatory for withdraw' });
+                    .json({ error: 'origin is mandatory for withdraw' });
             }
 
             try {
-                const originAccount = AccountService.withdraw(origin, amount);
+                const originAccount = withdrawUseCase.execute(origin, amount);
                 if (!originAccount) {
                     return res.status(404).send('0');
                 }
@@ -197,6 +206,9 @@ router.post('/event', (req: Request, res: Response) => {
             } catch (error) {
                 if (error instanceof Error && error.message === 'Insufficient balance') {
                     return res.status(400).json({ error: 'Insufficient balance' });
+                }
+                if (error instanceof Error && error.message === 'Amount must be positive') {
+                    return res.status(400).json({ error: 'Amount must be positive' });
                 }
                 return res.status(500).json({ error: 'Error processing withdraw' });
             }
@@ -213,7 +225,7 @@ router.post('/event', (req: Request, res: Response) => {
             }
 
             try {
-                const result = AccountService.transfer(origin, destination, amount);
+                const result = transferUseCase.execute(origin, destination, amount);
                 if (!result) {
                     return res.status(404).send('0');
                 }
@@ -223,6 +235,9 @@ router.post('/event', (req: Request, res: Response) => {
                 if (error instanceof Error && error.message === 'Insufficient balance') {
                     return res.status(400).json({ error: 'Insufficient balance' });
                 }
+                if (error instanceof Error && error.message === 'Amount must be positive') {
+                    return res.status(400).json({ error: 'Amount must be positive' });
+                }
                 return res.status(500).json({ error: 'Error processing transfer' });
             }
         }
@@ -230,6 +245,8 @@ router.post('/event', (req: Request, res: Response) => {
         default:
             return res.status(400).json({ error: 'Event type is invalid' });
     }
-});
+}
+
+router.post('/event', processEvent);
 
 export default router;

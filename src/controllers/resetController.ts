@@ -19,9 +19,11 @@ const router = express.Router();
  *               type: string
  *               example: OK
  */
-router.post('/reset', (_req: Request, res: Response) => {
+export function resetAccounts(_req: Request, res: Response) {
     AccountService.reset();
     res.status(200).send('OK');
-});
+}
+
+router.post('/reset', resetAccounts);
 
 export default router;

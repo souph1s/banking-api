@@ -44,7 +44,7 @@ const router = express.Router();
  *                   type: string
  *                   example: "account_id is mandatory"
  */
-router.get('/balance', (req: Request, res: Response) => {
+export function getBalance(req: Request, res: Response) {
     const { account_id } = req.query;
 
     if (!account_id || typeof account_id !== 'string') {
@@ -58,6 +58,8 @@ router.get('/balance', (req: Request, res: Response) => {
     }
 
     return res.status(200).send(account.balance.toString());
-});
+}
+
+router.get('/balance', getBalance);
 
 export default router;

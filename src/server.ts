@@ -1,8 +1,8 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
-import balanceRoutes from './routes/balance';
-import eventRoutes from './routes/event';
-import resetRoutes from './routes/reset';
+import balanceController from './controllers/balanceController';
+import eventController from './controllers/eventController';
+import resetController from './controllers/resetController';
 import { specs, swaggerUi } from './swagger';
 
 const app = express();
@@ -13,9 +13,9 @@ app.use(express.json());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-app.use('/', balanceRoutes);
-app.use('/', eventRoutes);
-app.use('/', resetRoutes);
+app.use('/', balanceController);
+app.use('/', eventController);
+app.use('/', resetController);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     console.error(err.stack);
